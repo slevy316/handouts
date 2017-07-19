@@ -31,39 +31,67 @@ ggplot(data = animals,
   geom_point(stat = 'summary',
              fun.y = 'mean')
 
-## Exercise 1
+## Exercise 1: Using dplyr and ggplot show how the mean weight of 
+##             individuals of the species DM changes over time, 
+##            with males and females shown in different colors.
 
-...
 
-## Adding a regression line
+animals_DM <- filter(animals, species_id == "DM")
+
+ggplot(data = animals_DM,
+       aes(x = year, y = weight, color = sex)) +
+  geom_line(stat = "summary",
+             fun.y = "mean")
+  
+
+
+ ## Differentiating point type
 
 levels(animals$sex) <- c('Female', 'Male')
-animals_dm <- filter(animals, ...)
-ggplot(...,
+animals_dm <- filter(animals, species_id == "DM")
+ggplot(data=animals_dm,
        aes(x = year, y = weight)) +
-  geom_point(...,
-             size = 3,
+  geom_point(aes(shape=sex),    ##aesthetic can be used in multiple places for more precision
+             size = 3,          ## vary no. of sizes
+             stat = 'summary',
+             fun.y = 'mean')
+
+  ## Adding a regression line
+
+levels(animals$sex) <- c('Female', 'Male')
+animals_dm <- filter(animals, species_id == "DM")
+ggplot(data=animals_dm,
+       aes(x = year, y = weight)) +
+  geom_point(aes(shape=sex),    ##aesthetic can be used in multiple places for more precision
+             size = 3,          ## vary no. of sizes
              stat = 'summary',
              fun.y = 'mean') +
-  ...
+  geom_smooth(method="lm")     ## adding geom_smooth gives a line
 
-ggplot(data = animals_dm,
-       aes(x = year, y = weight)) + 
-  geom_point(aes(shape = sex),
-             size = 3,
+ ## adding seperate regression layers
+
+levels(animals$sex) <- c('Female', 'Male')
+animals_dm <- filter(animals, species_id == "DM")
+ggplot(data=animals_dm,
+       aes(x = year, y = weight)) +
+  geom_point(aes(shape=sex),    
+             size = 3,          
              stat = 'summary',
              fun.y = 'mean') +
-  geom_smooth(...)
+  geom_smooth(aes(group=sex), method="lm") ## adding an aethetic allows to split by existing group
 
-ggplot(data = animals_dm,
-       aes(...,
-           ...,
-           ...) + 
-  geom_point(aes(shape = sex),
-             size = 3,
-	           stat = 'summary',
-	           fun.y = 'mean') +
-  geom_smooth(method = 'lm')
+## adding colour to your chart
+
+levels(animals$sex) <- c('Female', 'Male')
+animals_dm <- filter(animals, species_id == "DM")
+ggplot(data=animals_dm,
+       aes(x = year, y = weight, color=sex)) + ##add the colour to first aesthetic to apply to whole thang
+  geom_point(aes(shape=sex),    
+             size = 3,         
+             stat = 'summary',
+             fun.y = 'mean') +
+  geom_smooth(aes(group=sex), method="lm")
+
 
 # Storing and re-plotting
 
@@ -77,61 +105,85 @@ year_wgt <- ggplot(data = animals_dm,
              fun.y = 'mean') +
   geom_smooth(method = 'lm')
 
+##editing colour schemes
+
 year_wgt +
-  ...
+  scale_color_manual(values=c("darkblue","orange"))
                      
 year_wgt <- year_wgt +
-  scale_color_manual(...)
+  scale_color_manual(values = c("darkblue","green"))
+
 year_wgt
 
-## Exercise 2
+## Exercise 2: Create a histogram, using a geom_histogram() layer, 
+##             of the weights of individuals of species DM and divide 
+##             the data by sex. Note that instead of using color in 
+##             the aesthetic, you’ll use fill to distinguish the sexes. 
+##             Also open the help with ?geom_histogram and determine 
+##             how to explicitly set the bin width.
 
-...
+?geom_histogram
+
+
+dist_dm <- ggplot(data = animals_dm,
+                  aes(x = weight, fill = sex)) +
+  geom_histogram(binwidth= 0.5)
+
+dist_dm
 
 ## Axes, labels and themes
 
 histo <- ggplot(data = animals_dm,
                 aes(x = weight, fill = sex)) +
-  geom_...
+  geom_histogram(binwidth=0.75)
+
 histo
 
+## Axes & labels
+
 histo <- histo +
-  ...(title = 'Dipodomys merriami weight distribution',
+  labs(title = 'Dipodomys merriami weight distribution',     ## labs=labels
        x = 'Weight (g)',
        y = 'Count') +
   scale_x_continuous(limits = c(20, 60),
                      breaks = c(20, 30, 40, 50, 60))
+
 histo
 
+## Themes
+
 histo <- histo +
-  theme_bw() +
-  theme(legend.position = c(0.2, 0.5),
-        plot.title = ...,
-        ... = element_text(...),
-        ... = element_text(size = 13, vjust = 0))
+  theme_bw() +                                                ## adding in presets
+  theme(legend.position = c(0.2, 0.5),                        ## tweaks using theme()
+        plot.title = element_text(face = "bold", vjust = 2),  ## plot.title is editing not setting title
+        axes.title.y =  element_text(size = 13, vjust = 1),
+        axes.title.x = element_text(size = 13, vjust = 0))
+
 histo
 
 ## Facets
 
-animals_common <- filter(animals, ...)
-ggplot(data = ...,
-       ...) +
-  geom_histogram() +
-  ...
-  labs(title = "Weight of most common species",
-       x = "Count",
-       y = "Weight (g)")
-
+animals_common <- filter(animals, species_id %in% c("DM", "DO", "PP"))
 ggplot(data = animals_common,
-       aes(x = weight)) +
-  geom_histogram(...,
-                 ...) +
+       aes(x=weight)) +
   geom_histogram() +
-  facet_wrap( ~ species_id) +
+  facet_wrap(~ species_id)
   labs(title = "Weight of most common species",
        x = "Count",
        y = "Weight (g)")
 
+## More complex facets 
+  
+  ggplot(data = animals_common,
+         aes(x = weight)) +
+    geom_histogram(data = select(animals_common, -species_id),
+                   alpha = 0.2) +
+    geom_histogram() +
+    facet_wrap( ~ species_id) +
+    labs(title = "Weight of most common species",
+         x = "Count",
+         y = "Weight (g)")
+  
 ggplot(data = animals_common,
        aes(x = weight, ...)) +
   geom_histogram(...) +
@@ -141,7 +193,13 @@ ggplot(data = animals_common,
        y = "Weight (g)") +
   guides(fill = FALSE)		
 
-## Exercise 3
+## Exercise 3: facetgrid
 
-...
+ggplot(data = animals_common,
+       aes(x=weight)) +
+  geom_histogram() +
+  facet_grid(sex ~ species_id) +
+  labs(title = "Weight of species by sex",
+         x = "Count",
+         y = "Weight (g)")
 
