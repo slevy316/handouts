@@ -1,29 +1,32 @@
 ## Getting started
 
 library(dplyr)
-library(...)
-animals <- read.csv(..., na.strings = '') %>%
+library(ggplot2)
+animals <- read.csv("data/animals.csv", na.strings = '') %>%
   filter(!is.na(species_id), !is.na(sex), !is.na(weight))
 
 ## Constructing layered graphics in ggplot
 
-ggplot(...,
-       ...) +
-  ...
+ggplot(data=animals,
+       aes(x=species_id, y=weight)) +
+  geom_point()
+  
+
+##ggplot2 is a Hadley/tidyverse package and means that it is very well documented
 
 ggplot(data = animals,
        aes(x = species_id, y = weight)) +
-  ...
+  geom_boxplot()
 
 ggplot(data = animals,
-       aes(x = species_id, y = weight)) +
-  geom_boxplot() ...
-  geom_point(...,
-             ...,
-             ...)
+       aes(x = species_id, y = weight)) + ## aesthetic layer
+  geom_boxplot() +              ## + is key
+  geom_point(stat = "summary",  ## set no of options for stat, depends on geometry using
+             fun.y = "mean",    ## function
+             color = "red")     ##
 
 ggplot(data = animals,
-       aes(x = species_id, y = weight, ...)) +
+       aes(x = species_id, y = weight, color = species_id)) + ## addinging color here applies effect to whole thing
   geom_boxplot() +
   geom_point(stat = 'summary',
              fun.y = 'mean')
