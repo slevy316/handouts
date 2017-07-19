@@ -1,32 +1,60 @@
 ## lm
 
 animals <- read.csv('data/animals.csv', stringsAsFactors = FALSE, na.strings = '')
-fit <- lm(
-  ...,
+fit <- lm(                                   ##fit is now a fitted model, can see this with summary()
+  formula = log(weight) ~ hindfoot_length,
   data = animals)
 
+## Exercise 1: regress hindfoot_length against weight and species_id. Does it
+##             appear that the DM have inordinately large feet for their weight?
 
-animals$species_id <- ...
+library(dplyr)
+animals_dm <- filter(animals, species_id == "DM")
+
 fit <- lm(
-  ...,
-  data = animals)
+  formula = hindfoot_length ~ weight + species_id,
+  data = animals
+)
+
+## NOTE: In this eg R has read each *unique character strings* into *new factors*
+
+summary(fit)
 
 ## glm
 
-animals$sex <- ...
-fit <- glm(sex ~ hindfoot_length,
-           ...,
+## Exercise 2: compare lm & glm (linear model vs. general linear model)
+
+fit    <- lm ( log(weight) ~ species_id, data = animals)
+glmfit <- glm( log(weight) ~ species_id, data = animals) ## default stat family is gaussian. Would have to specify family to change this
+
+summary(fit)
+summary(glmfit)
+
+#logistical regression
+
+animals$sex <- factor(animals$sex)
+fit_new <- glm(sex ~ hindfoot_length,
+           family = binomial,                            ## specifying the family  
            data = animals)
 
-## lme4
+summary(fit_new)
 
-# install.packages('lme4')
+
+## lme4 (linear mixed models - extends to model to allow descriotions of "random effects")
+
+
+# if not done yet make sure to do: install.packages('lme4')
 
 library(lme4)
-fit <- lmer(...,
+fit <- lmer(log(weight) ~ (1 | species_id) + hindfoot_length,
             data = animals)
 
-fit <- lmer(...,
+## Exercise 4: Adjust the formula log(weight) ~ hindfoot_length to fit a
+##             “random intercepts” model, grouping by a different categorical 
+##             variable (i.e. not species_id) in the animals data frame.
+
+
+fit <- lmer(log(weight) ~ species_id, data = animals,
             data = animals)
 
 ## RStan
