@@ -1,6 +1,6 @@
 # Libraries
-library(...)
-library(...)
+library(dplyr)
+library(shiny)
 
 # Data
 species <- read.csv('data/species.csv', stringsAsFactors = FALSE)
@@ -11,18 +11,18 @@ in1 <- selectInput(inputId = 'pick_species',
                    label = 'Pick a species',
 		   choices = unique(species[['id']]))
 out1 <- textOutput('species_id')
-...
-tab <- tabPanel('Species', in1, out1, ...)
-ui <- navbarPage(title = 'Portal Project', tab)
+out2 <- plotOutput("species_plot")
+tab <- tabPanel('Species', in1, out1, out2)                       ## defines what the tabs will be
+ui <- navbarPage(title = 'Portal Project', tab)                   ##
 
 # Server
 server <- function(input, output) {
   output[['species_id']] <- renderText(input[['pick_species']])
-  output[['species_plot']] <- renderPlot(
-    ...
-    ...
-    ...
-    ...
+  output[['species_plot']] <- renderPlot(                         ## instructions for how to create output
+    animals %>%
+      filter(species_id==input[["pick_species"]]) %>%
+      ggplot(aes(year, fill = "red")) +                          ## modify the fill, colour etc.
+      geom_bar()
   )
 }
 
