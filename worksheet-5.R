@@ -34,6 +34,7 @@ ggplot(data = animals,
 ## Exercise 1: Using dplyr and ggplot show how the mean weight of 
 ##             individuals of the species DM changes over time, 
 ##            with males and females shown in different colors.
+<<<<<<< HEAD
 
 
 animals_DM <- filter(animals, species_id == "DM")
@@ -45,6 +46,19 @@ ggplot(data = animals_DM,
   
 
 
+=======
+
+
+animals_DM <- filter(animals, species_id == "DM")
+
+ggplot(data = animals_DM,
+       aes(x = year, y = weight, color = sex)) +
+  geom_line(stat = "summary",
+             fun.y = "mean")
+  
+
+
+>>>>>>> 63053cfb7e76e4fc6fa5906d8331e875a449b4e6
  ## Differentiating point type
 
 levels(animals$sex) <- c('Female', 'Male')
@@ -121,10 +135,17 @@ year_wgt
 ##             the aesthetic, you’ll use fill to distinguish the sexes. 
 ##             Also open the help with ?geom_histogram and determine 
 ##             how to explicitly set the bin width.
+<<<<<<< HEAD
 
 ?geom_histogram
 
 
+=======
+
+?geom_histogram
+
+
+>>>>>>> 63053cfb7e76e4fc6fa5906d8331e875a449b4e6
 dist_dm <- ggplot(data = animals_dm,
                   aes(x = weight, fill = sex)) +
   geom_histogram(binwidth= 0.5)
@@ -202,4 +223,6 @@ ggplot(data = animals_common,
   labs(title = "Weight of species by sex",
          x = "Count",
          y = "Weight (g)")
+
+
 
