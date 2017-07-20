@@ -1,4 +1,7 @@
-# Libraries
+##note: html or markdown format can be used within a shiny
+
+
+# Libraries       
 library(ggplot2)
 library(dplyr)
 
