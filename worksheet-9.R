@@ -113,25 +113,31 @@ class(nlcd)
 plot(nlcd)
 plot(huc_md, add = T)
 
-## Crop
+## Crop                                                     ### CHECK OUT RSPATIAL.ORG 
 
 extent <- matrix(st_bbox(huc_md), nrow = 2)                 ## need to convert huc layer into something that raster package will understand
-nlcd <- crop(nlcd, extent)
-plot(nlcd)
+nlcd <- crop(nlcd, extent)                                  ## crop shapefiles to match another layer
+plot(nlcd)            
 plot(state_md, add = T)
 
 ## Raster data attributes
 
 lc_types <- nlcd@data@attributes[[1]]$Land.Cover.Class
 
+lc_types
+
 ## Raster math
 
-pasture <- mask(nlcd, nlcd == 81, maskvalue = FALSE)
-plot(pasture)
+pasture <- mask(nlcd, nlcd == 81, maskvalue = FALSE)     ## mask is how you pull out just one type of value (here it is pastureland) can do multiple by selecting c(81, 82, etc)
+plot(pasture)                                            ## reclassify can be used to unite layers together if required
 
-nlcd_agg <- ...(nlcd, ..., ...)
-...
+
+nlcd_agg <- aggregate(nlcd, fact = 25, fun = modal)      ## aggregating pixels by 25x
+nlcd_agg@legend <- nlcd@legend
 plot(nlcd_agg)
+
+res(nlcd)                                                ## checking the resolution
+res(nlcd_agg)
 
 ## Exercise 3
 
@@ -139,19 +145,22 @@ plot(nlcd_agg)
 
 ## Mixing rasters and vectors: prelude
 
-sesync <- as(..., "Spatial")
-huc_md <- as(..., "Spatial")
-counties_md <- ...
+sesync <- as(sesync, "Spatial")                         ## as() "coerces" objects into another type
+huc_md <- as(huc_md, "Spatial")
+counties_md <- as(counties_md, "Spatial")
 
 ## Mixing rasters and vectors
 
 plot(nlcd)
-plot(sesync, col = 'green', pch = 16, cex = 2, ...)
+plot(sesync, col = 'green', pch = 16, cex = 2, add = T)
 
-sesync_lc <- ...(nlcd, sesync)
+sesync_lc <- extract(nlcd, sesync)
+class(sesync_lc)                                       ## could be either matrix or numeric depending on whether single point or multiple. This is single point (23) so numeric
 
-county_nlcd <- ...
+county_nlcd <- extract(nlcd_agg, counties_md[1, ])
+tables_county_nlcd
 
-modal_lc <- extract(...)
+modal_lc <- extract(nlcd_agg, huc_md, fun = modal)
+
 ... <- lc_types[modal_lc + 1]
 
